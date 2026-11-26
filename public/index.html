@@ -1129,14 +1129,37 @@
         };
 
         function articleMatches(a) {
-            const text = (a.title + ' ' + (a.tags || []).join(' ') + ' ' + (a.excerpt || '') + ' ' + (a.category || '')).toLowerCase();
+            const title = (a.title || '').toLowerCase();
+            const cat = (a.category || '').toLowerCase();
+            const tags = (a.tags || []).map(t => t.toLowerCase());
+            const text = (title + ' ' + tags.join(' ') + ' ' + (a.excerpt || '') + ' ' + cat);
 
             if (currentFilterObj.type === 'all') return true;
-            if (currentFilterObj.type === 'cat') return (a.category || '').toLowerCase() === currentFilterObj.val.toLowerCase();
+
+            // Champagne & Bobler (præcis matching så tilfældige rødvin-tags ekskluderes)
+            if (currentFilterObj.type === 'champagne' || (currentFilterObj.type === 'tag' && currentFilterObj.val.toLowerCase() === 'champagne')) {
+                return (
+                    cat.includes('mousse') ||
+                    ['champagne', 'bobler', 'cava', 'crémant', 'cremant', 'prosecco', 'spumante', 'franciacorta', 'meunier'].some(k => title.includes(k)) ||
+                    (tags.some(t => t.includes('champagne')) && !['rødvin', 'hvidvin'].includes(cat))
+                );
+            }
+
+            if (currentFilterObj.type === 'cat') {
+                if (currentFilterObj.val.toLowerCase() === 'rødvin') {
+                    return cat === 'rødvin' && !cat.includes('mousse') && !['champagne', 'bobler', 'hvidvin'].some(k => title.includes(k));
+                }
+                if (currentFilterObj.val.toLowerCase() === 'hvidvin') {
+                    return cat === 'hvidvin' && !cat.includes('mousse');
+                }
+                return cat === currentFilterObj.val.toLowerCase();
+            }
+
             if (currentFilterObj.type === 'tag') {
                 const val = currentFilterObj.val.toLowerCase();
-                return (a.tags || []).some(t => t.toLowerCase().includes(val)) || a.title.toLowerCase().includes(val);
+                return tags.some(t => t.includes(val)) || title.includes(val);
             }
+
             if (currentFilterObj.type === 'pillar') {
                 if (currentFilterObj.val === 'regioner') {
                     return ['italien', 'piemonte', 'barolo', 'barbaresco', 'chianti', 'toscana', 'veneto', 'amarone', 'frankrig', 'bourgogne', 'champagne', 'bordeaux', 'rhone', 'rhône', 'jura', 'beaujolais', 'spanien', 'rioja', 'ribera', 'tyskland', 'mosel', 'napa'].some(k => text.includes(k));
@@ -1145,15 +1168,17 @@
                     return ['pinot noir', 'nebbiolo', 'chardonnay', 'riesling', 'cabernet', 'syrah', 'shiraz', 'meunier', 'merlot', 'sangiovese', 'sauvignon'].some(k => text.includes(k));
                 }
                 if (currentFilterObj.val === 'mad-vin') {
-                    return ['mad', 'parring', 'menu', 'lam', 'jul', 'nytår', 'gastronomi', 'fisk'].some(k => text.includes(k));
+                    return cat.includes('mad') || ['mad', 'parring', 'menu', 'lam', 'jul', 'nytår', 'gastronomi', 'fisk'].some(k => title.includes(k) || text.includes(k));
                 }
                 if (currentFilterObj.val === 'viden') {
                     return ['købe', 'guide', 'tannin', 'fad', 'fade', 'årgang', 'lagring', 'historie', 'biodynamisk', 'innovation', 'produktion', 'klima', 'viden', 'hvad betyder'].some(k => text.includes(k));
                 }
             }
+
             if (currentFilterObj.type === 'sub') {
                 return text.includes(currentFilterObj.val.toLowerCase());
             }
+
             return true;
         }
 
