@@ -16,6 +16,13 @@ BASE_DIR = "/Users/agenten/vinverdenenrundt"
 CONTENT_DIR = os.path.join(BASE_DIR, "content", "articles")
 DATA_FILE = os.path.join(BASE_DIR, "data", "articles_index.json")
 
+# Importer billedgenerator
+sys.path.append(os.path.join(BASE_DIR, "scripts"))
+try:
+    from generate_image import generate_wine_image
+except ImportError:
+    generate_wine_image = None
+
 def slugify(text):
     text = text.lower()
     text = re.sub(r"[æ]", "ae", text)
@@ -25,11 +32,21 @@ def slugify(text):
     text = re.sub(r"[\s_-]+", "-", text).strip("-")
     return text
 
-def add_article(title, category, tags, excerpt, markdown_body, image_rel="/images/italien-vin.jpg", auto_push=True):
+def add_article(title, category, tags, excerpt, markdown_body, image_rel=None, image_prompt=None, auto_push=True):
     slug = slugify(title)
     now_iso = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+    # 1. Billedhåndtering (AI-generering via Google Gemini hvis intet billede er givet)
+    if not image_rel and image_prompt and generate_wine_image:
+        print(f"📸 Genererer skræddersyet forsidebillede via Google Gemini...")
+        generated = generate_wine_image(image_prompt, slug)
+        if generated:
+            image_rel = generated
+
+    if not image_rel:
+        image_rel = "/images/italien-vin.jpg"
     
-    # 1. Byg Frontmatter
+    # 2. Byg Frontmatter
     safe_title = title.replace('"', '\\"')
     safe_excerpt = excerpt.replace('"', '\\"')
     
