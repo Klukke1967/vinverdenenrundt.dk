@@ -10,6 +10,7 @@ import re
 import sys
 import json
 import subprocess
+import unicodedata
 from datetime import datetime
 
 BASE_DIR = "/Users/agenten/vinverdenenrundt"
@@ -25,9 +26,8 @@ except ImportError:
 
 def slugify(text):
     text = text.lower()
-    text = re.sub(r"[æ]", "ae", text)
-    text = re.sub(r"[ø]", "oe", text)
-    text = re.sub(r"[å]", "aa", text)
+    text = text.replace("æ", "ae").replace("ø", "oe").replace("å", "aa")
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[\s_-]+", "-", text).strip("-")
     return text

@@ -1,5 +1,50 @@
 [
   {
+    "title": "De skæve julematch: Sød Riesling, Lambrusco og andre alternativer",
+    "slug": "de-skaeve-julematch-soed-riesling-lambrusco-og-andre-alternativer",
+    "date": "2026-11-26T19:24:58",
+    "category": "Mad & Vin",
+    "tags": [
+      "julemad",
+      "Riesling",
+      "sød vin",
+      "Lambrusco",
+      "mad-og-vin"
+    ],
+    "image": "/images/i-mosel-er-riesling-kongen-duu.jpg",
+    "excerpt": "Den bedste julevin behøver ikke være rød. Sød Riesling, mousserende Lambrusco og andre friske alternativer kan løfte både fedme og sødme."
+  },
+  {
+    "title": "Rhône til julebordet: Fra Côtes du Rhône til Châteauneuf-du-Pape",
+    "slug": "rhone-til-julebordet-fra-cotes-du-rhone-til-chateauneuf-du-pape",
+    "date": "2026-11-26T19:24:58",
+    "category": "Rødvin",
+    "tags": [
+      "Rhône",
+      "Côtes du Rhône",
+      "Châteauneuf-du-Pape",
+      "julemad",
+      "Grenache"
+    ],
+    "image": "/images/Rhone-Guigal--jpg.webp",
+    "excerpt": "Rhône-vine giver flere veje gennem julemiddagen: frisk Côtes du Rhône til det klassiske bord og mere koncentrerede appellationer til den kraftige sovs."
+  },
+  {
+    "title": "Ripasso og Amarone til den danske julemiddag: Fylde med syre som modspil",
+    "slug": "ripasso-og-amarone-til-den-danske-julemiddag-fylde-med-syre-som-modspil",
+    "date": "2026-11-26T19:24:57",
+    "category": "Mad & Vin",
+    "tags": [
+      "julemad",
+      "Ripasso",
+      "Amarone",
+      "mad-og-vin",
+      "Valpolicella"
+    ],
+    "image": "/images/jul-i-dk.jpg",
+    "excerpt": "Ripasso og Amarone kan matche den fede danske julemad, men syre, serveringstemperatur og tilbehør afgør, om vinen løfter eller tynger måltidet."
+  },
+  {
     "id": 2310,
     "title": "Hvad skal jeg købe i Chianti",
     "slug": "hvad-skal-jeg-kobe-i-chianti",
