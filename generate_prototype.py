@@ -453,7 +453,34 @@ html_template = f"""<!DOCTYPE html>
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
             gap: 32px;
-            margin-bottom: 64px;
+            margin-bottom: 32px;
+        }}
+
+        .load-more-wrap {{
+            text-align: center;
+            margin: 32px 0 64px;
+        }}
+
+        .btn-load-more {{
+            background: var(--bg-card);
+            border: 2px solid var(--gold);
+            color: var(--wine-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
+        }}
+
+        .btn-load-more:hover {{
+            background: var(--wine-primary);
+            color: #ffffff;
+            border-color: var(--wine-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }}
 
         .article-card {{
@@ -892,13 +919,13 @@ html_template = f"""<!DOCTYPE html>
                 <div class="brand-subtitle">Terroir • Tradition • Smag</div>
             </a>
             <ul class="nav-links">
-                <li><a href="#" class="active" onclick="filterCategory('all'); return false;">Forside</a></li>
-                <li><a href="#" onclick="filterByTag('Bourgogne'); return false;">Bourgogne</a></li>
-                <li><a href="#" onclick="filterByTag('Champagne'); return false;">Champagne</a></li>
-                <li><a href="#" onclick="filterByTag('piemonte'); return false;">Piemonte</a></li>
-                <li><a href="#" onclick="filterByTag('chianti'); return false;">Toscana</a></li>
-                <li><a href="#" onclick="filterByTag('riesling'); return false;">Riesling & Tyskland</a></li>
-                <li><a href="#" onclick="filterCategory('Mad & Vin'); return false;">Mad & Vin</a></li>
+                <li><a href="#" class="nav-link-item active" data-filter="all" onclick="filterCategory('all'); return false;">Forside</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="tag:Bourgogne" onclick="filterByTag('Bourgogne'); return false;">Bourgogne</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="tag:Champagne" onclick="filterByTag('Champagne'); return false;">Champagne</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="tag:piemonte" onclick="filterByTag('piemonte'); return false;">Piemonte</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="tag:chianti" onclick="filterByTag('chianti'); return false;">Toscana</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="tag:riesling" onclick="filterByTag('riesling'); return false;">Riesling & Tyskland</a></li>
+                <li><a href="#" class="nav-link-item" data-filter="Mad & Vin" onclick="filterCategory('Mad & Vin'); return false;">Mad & Vin</a></li>
             </ul>
         </div>
     </header>
@@ -947,6 +974,8 @@ html_template = f"""<!DOCTYPE html>
             <div class="article-grid" id="articleGrid">
                 <!-- Artikler indsættes med JS -->
             </div>
+
+            <div class="load-more-wrap" id="loadMoreContainer"></div>
         </section>
 
         <!-- REGIONS CAROUSEL -->
@@ -1030,6 +1059,8 @@ html_template = f"""<!DOCTYPE html>
         const articles = {json.dumps(articles, ensure_ascii=False)};
         const contentLookup = {json.dumps(content_lookup, ensure_ascii=False)};
 
+        const PAGE_SIZE = 18;
+        let visibleCount = PAGE_SIZE;
         let currentFilter = 'all';
         let currentSearch = '';
 
@@ -1066,6 +1097,7 @@ html_template = f"""<!DOCTYPE html>
 
         function renderArticles() {{
             const grid = document.getElementById('articleGrid');
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
             const searchLower = currentSearch.toLowerCase().trim();
 
             const filtered = articles.slice(1).filter(a => {{
@@ -1103,7 +1135,7 @@ html_template = f"""<!DOCTYPE html>
                 return true;
             }});
 
-            document.getElementById('articleCountBadge').innerText = `Viser ${{filtered.length}} artikler`;
+            document.getElementById('articleCountBadge').innerText = `Viser ${{Math.min(visibleCount, filtered.length)}} af ${{filtered.length}} artikler`;
 
             if (filtered.length === 0) {{
                 grid.innerHTML = `
@@ -1114,10 +1146,13 @@ html_template = f"""<!DOCTYPE html>
                         <button onclick="resetFilters()" style="margin-top: 16px; background: var(--wine-primary); color: #fff; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer;">Nulstil filtre</button>
                     </div>
                 `;
+                loadMoreContainer.style.display = 'none';
                 return;
             }}
 
-            grid.innerHTML = filtered.map(a => {{
+            const visible = filtered.slice(0, visibleCount);
+
+            grid.innerHTML = visible.map(a => {{
                 const dateStr = new Date(a.date).toLocaleDateString('da-DK', {{ day: 'numeric', month: 'short', year: 'numeric' }});
                 const img = a.image || '/images/italien-vin.jpg';
                 return `
@@ -1141,18 +1176,49 @@ html_template = f"""<!DOCTYPE html>
                     </article>
                 `;
             }}).join('');
+
+            // Pagination button
+            if (visibleCount < filtered.length) {{
+                loadMoreContainer.style.display = 'block';
+                loadMoreContainer.innerHTML = `
+                    <button class="btn-load-more" onclick="loadMore()">
+                        Indlæs flere artikler (${{visible.length}} af ${{filtered.length}}) ↓
+                    </button>
+                `;
+            }} else {{
+                loadMoreContainer.style.display = 'none';
+            }}
+        }}
+
+        function loadMore() {{
+            visibleCount += PAGE_SIZE;
+            renderArticles();
+        }}
+
+        function updateNavLinks(targetFilter) {{
+            document.querySelectorAll('.nav-link-item').forEach(link => {{
+                if (link.getAttribute('data-filter') === targetFilter) {{
+                    link.classList.add('active');
+                }} else {{
+                    link.classList.remove('active');
+                }}
+            }});
         }}
 
         function filterCategory(cat, btn) {{
             currentFilter = cat;
+            visibleCount = PAGE_SIZE;
             updateFilterButtons(btn);
+            updateNavLinks(cat);
             document.getElementById('gridTitle').innerText = cat === 'all' ? 'Seneste Vinartikler' : `Artikler om ${{cat}}`;
             renderArticles();
         }}
 
         function filterByTag(tag, btn) {{
             currentFilter = 'tag:' + tag;
+            visibleCount = PAGE_SIZE;
             updateFilterButtons(btn);
+            updateNavLinks('tag:' + tag);
             document.getElementById('gridTitle').innerText = `Artikler med fokus på ${{tag}}`;
             renderArticles();
             document.querySelector('.search-section').scrollIntoView({{ behavior: 'smooth' }});
@@ -1168,15 +1234,18 @@ html_template = f"""<!DOCTYPE html>
         function resetFilters() {{
             currentFilter = 'all';
             currentSearch = '';
+            visibleCount = PAGE_SIZE;
             document.getElementById('searchInput').value = '';
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('.filter-btn').classList.add('active');
+            updateNavLinks('all');
             document.getElementById('gridTitle').innerText = 'Seneste Vinartikler';
             renderArticles();
         }}
 
         document.getElementById('searchInput').addEventListener('input', (e) => {{
             currentSearch = e.target.value;
+            visibleCount = PAGE_SIZE;
             renderArticles();
         }});
 
