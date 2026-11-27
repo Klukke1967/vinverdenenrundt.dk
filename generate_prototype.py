@@ -57,6 +57,19 @@ html_template = f"""<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VinVerdenenRundt — Magasinet om vin, terroir og gastronomi</title>
+    <meta name="description" content="VinVerdenenRundt er et dansk vinmagasin om vinregioner, druer, terroir, årgange, mad og vin samt inspirerende vinoplevelser.">
+    <link rel="canonical" href="https://vinverdenenrundt.dk/">
+    <script type="application/ld+json">
+    {{
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "VinVerdenenRundt",
+      "url": "https://vinverdenenrundt.dk/",
+      "description": "Dansk vinmagasin om vin, terroir og gastronomi",
+      "inLanguage": "da-DK",
+      "publisher": {{"@type": "Person", "name": "Klaus Kryger"}}
+    }}
+    </script>
     <!-- Cache control & PWA -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">

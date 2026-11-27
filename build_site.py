@@ -621,6 +621,9 @@ for idx, art in enumerate(articles, start=1):
     raw_md = re.sub(r"https://vinverdenenrundt\.dk/wp-content/uploads/\d{4}/\d{2}/([^)\s]+)", r"/images/\1", raw_md)
     
     body_html = md_converter.convert(raw_md)
+    # Article template already owns the single H1. Convert legacy markdown H1s
+    # to H2s so imported articles do not create duplicate H1 elements.
+    body_html = re.sub(r"<h1(\\s[^>]*)?>(.*?)</h1>", r"<h2\\1>\\2</h2>", body_html, flags=re.IGNORECASE | re.DOTALL)
     
     # Reset markdown converter state
     md_converter.reset()
@@ -647,6 +650,25 @@ for idx, art in enumerate(articles, start=1):
         print(f"  [{idx}/{len(articles)}] Genereret: /{slug}/")
 
 print("\n🗺️  Genererer sitemap.xml og robots.txt...")
+
+# Preserve inbound links after cleaning legacy emoji-based slugs.
+LEGACY_REDIRECTS = {
+    "udforsk-vin-fra-det-sydlige-rhone-en-rejse-gennem-solskin-og-smag-%f0%9f%8c%9e%f0%9f%8d%87": "udforsk-vin-fra-det-sydlige-rhone-en-rejse-gennem-solskin-og-smag",
+    "mclaren-vale-vin-magi-en-dybdegaaende-guide-til-topvine-og-historien-bag-australiens-vinparadis-%f0%9f%8d%87%f0%9f%8c%8f": "mclaren-vale-vin-magi-en-dybdegaaende-guide-til-topvine-og-historien-bag-australiens-vinparadis",
+    "%f0%9f%8d%b7-alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd-%f0%9f%8d%87": "alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd",
+}
+for old_slug, new_slug in LEGACY_REDIRECTS.items():
+    alias_dir = os.path.join(PUBLIC_DIR, old_slug)
+    os.makedirs(alias_dir, exist_ok=True)
+    redirect_html = f'''<!doctype html>
+<html lang="da"><head>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="0;url=/{new_slug}/">
+<link rel="canonical" href="{DOMAIN}/{new_slug}/">
+<title>Side flyttet — VinVerdenenRundt</title>
+</head><body><p>Siden er flyttet. <a href="/{new_slug}/">Gå til artiklen</a>.</p></body></html>'''
+    with open(os.path.join(alias_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(redirect_html)
 
 # Generate sitemap.xml
 sitemap_xml = ['<?xml version="1.0" encoding="UTF-8"?>',
