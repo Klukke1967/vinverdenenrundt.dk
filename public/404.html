@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>Siden er flyttet — VinVerdenenRundt</title>
+</head>
+<body>
+  <p>Siden er flyttet. <a id="fallback" href="/">Gå til VinVerdenenRundt</a>.</p>
+  <script>
+    const redirects = {
+      'udforsk-vin-fra-det-sydlige-rhone-en-rejse-gennem-solskin-og-smag-%f0%9f%8c%9e%f0%9f%8d%87': 'udforsk-vin-fra-det-sydlige-rhone-en-rejse-gennem-solskin-og-smag',
+      'mclaren-vale-vin-magi-en-dybdegaaende-guide-til-topvine-og-historien-bag-australiens-vinparadis-%f0%9f%8d%87%f0%9f%8c%8f': 'mclaren-vale-vin-magi-en-dybdegaaende-guide-til-topvine-og-historien-bag-australiens-vinparadis',
+      '%f0%9f%8d%b7-alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd-%f0%9f%8d%87': 'alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd'
+    };
+    const path = location.pathname.replace(/^\/+|\/+$/g, '');
+    const key = path.toLowerCase();
+    const target = redirects[key] || redirects[encodeURIComponent(decodeURIComponent(path)).toLowerCase()];
+    if (target) location.replace('/' + target + '/');
+  </script>
+</body>
+</html>
