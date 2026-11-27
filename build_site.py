@@ -5,6 +5,7 @@ import json
 import time
 import hashlib
 from datetime import datetime
+from urllib.parse import unquote
 import markdown
 
 BASE_DIR = "/Users/agenten/vinverdenenrundt"
@@ -658,7 +659,7 @@ LEGACY_REDIRECTS = {
     "%f0%9f%8d%b7-alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd-%f0%9f%8d%87": "alternativer-vin-til-jule-middagen-de-skjulte-julevine-fra-syd",
 }
 for old_slug, new_slug in LEGACY_REDIRECTS.items():
-    alias_dir = os.path.join(PUBLIC_DIR, old_slug)
+    alias_dir = os.path.join(PUBLIC_DIR, unquote(old_slug))
     os.makedirs(alias_dir, exist_ok=True)
     redirect_html = f'''<!doctype html>
 <html lang="da"><head>
